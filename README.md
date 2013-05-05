@@ -26,6 +26,30 @@ function log () {
 }
 ```
 
+## stopping early
+
+because this module uses pull-streams, it's lazy,
+so you can do queries like the following:
+
+``` js
+//find the first package.json in a parent directory.
+glob('.../package.json').pipe(pull.take(1)).pipe(log())
+```
+
+And you will retrive only the first item, and _will
+not do any extra IO_. This is hugely useful when
+doing a large traversal...
+
+## collect node_module tree
+
+``` js
+glob('**/node_modules/*/package.json')
+  .pipe(pull.collect(function (e, arr) {
+    console.log(arr)
+  })
+
+```
+
 ## License
 
 MIT
