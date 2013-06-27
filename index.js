@@ -7,20 +7,15 @@ module.exports = function (x) {
   var rest = path.normalize(x).split('/')
   var stream
 
-  function pipe (next) {
-    if(!stream)
-      stream = next
-    else
-      stream = stream.pipe(next)
-  }
+  var pipe = []
 
   if(rest[0] == '...') {
-    pipe(pfs.ancestors())
+    pipe.push(pfs.ancestors())
     rest.shift()
   } else if(rest[0] === '~' || rest[0] === '') {
-    pipe(pull.values([rest.shift() ? process.env.HOME : '/']))
+    pipe.push(pull.values([rest.shift() ? process.env.HOME : '/']))
   } else {
-    pipe(pull.values(['.']))
+    pipe.push(pull.values(['.']))
   }
 
   //this should be tidied up.
@@ -28,7 +23,7 @@ module.exports = function (x) {
   //that handles escapes...
   rest.forEach(function (e) {
     if('**' === e) {
-      pipe(pfs.starStar())
+      pipe.push(pfs.starStar())
     } else if(/[*?]/.test(e)) {
       //literal
       e = e
@@ -43,23 +38,25 @@ module.exports = function (x) {
       }).join('')
 
       var x = new RegExp('^'+e.split('*').join('.*')+'$')
-      pipe(pfs.star(x))
+      pipe.push(pfs.star(x))
     } else if(e === '')
       //will only happen in the last position
       //if you do */
-      pipe(pfs.isDirectory())
+      pipe.push(pfs.isDirectory())
     else
-      pipe(pfs.resolve(e).pipe(pfs.exists()))
+      pipe.push(pull(pfs.resolve(e), pfs.exists()))
   })
 
-  return stream
+  return pull.apply(null, pipe)
 }
 
 if(!module.parent) {
+  if(!process.argv[2])
+    throw new Error("expect glob: '**/*.js'")
   s = module.exports(process.argv[2])
 
   if(/-f|--first/.test(process.argv[3]))
-    s = s.pipe(pull.take(1))
+    s = pull(s, pull.take(1))
 
-  s.pipe(pull.drain(console.log))
+  pull(s, pull.drain(console.log))
 }
