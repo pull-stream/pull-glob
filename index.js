@@ -2,6 +2,7 @@ var pfs  = require('pull-fs')
 var pull = require('pull-stream')
 var path = require('path')
 var glob =
+
 module.exports = function (x) {
 
   var rest = path.normalize(x).split('/')
@@ -24,7 +25,7 @@ module.exports = function (x) {
   rest.forEach(function (e) {
     if('**' === e) {
       pipe.push(pfs.starStar())
-    } else if(/[*?]/.test(e)) {
+    } else if(/[*?{}]/.test(e)) {
       //literal
       e = e
         .split('.').join('\\.')
@@ -60,3 +61,4 @@ if(!module.parent) {
 
   pull(s, pull.drain(console.log))
 }
+
