@@ -10,20 +10,23 @@ use with [pull-stream](https://github.com/dominictarr/pull-stream)
 var pull = require('pull-stream')
 var glob = require('pull-glob')
 
-glob('.')      .pipe(log()) // current dir
-glob('*.js')   .pipe(log()) // current dir
-glob('**')     .pipe(log()) // everything under current dir
-glob('**/*.js').pipe(log()) // .js recursively
-glob('...')    .pipe(log()) // parent directories
-glob('.../.*') .pipe(log()) // hidden files
-glob('.../node_modules/*')
-                .pipe(log()) // available modules!
-glob('.../{package,component}.json')
-                .pipe(log()) // search for local package files.
-
-function log () {
-  return pull.drain(console.log)
+function glob_log (name, pattern) {
+  pull(glob(pattern), pull.collect(function (err, ary) {
+    if(err) throw err
+    console.log('name:', name, 'pattern:', pattern)
+    console.log(ary)
+  })
 }
+
+
+glob_log('current dir', '.')
+glob_log('js in current dir', '*.js')
+glob_log('everything under current dir', '**')
+glob_log('all js under current dir', '**/*.js')
+glob_log('parent directories', '...')
+glob_log('hidden files', '.../.*')
+glob_log('available modules', '.../node_modules/*')
+glob_log('local package files', '.../{package,component}.json')
 ```
 
 ## stopping early
@@ -33,7 +36,7 @@ so you can do queries like the following:
 
 ``` js
 //find the first package.json in a parent directory.
-glob('.../package.json').pipe(pull.take(1)).pipe(log())
+pull(glob('.../package.json'), pull.take(1), log())
 ```
 
 And you will retrive only the first item, and _will
@@ -43,13 +46,18 @@ doing a large traversal...
 ## collect node_module tree
 
 ``` js
-glob('**/node_modules/*/package.json')
-  .pipe(pull.collect(function (e, arr) {
+pull(
+  glob('**/node_modules/*/package.json'),
+  pull.collect(function (e, arr) {
     console.log(arr)
   })
-
+)
 ```
 
 ## License
 
 MIT
+
+
+
+
