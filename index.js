@@ -1,9 +1,8 @@
 var pfs  = require('pull-fs')
-var pull = require('pull-stream')
+var pull = require('pull-stream/pull')
 var path = require('path')
-var glob =
 
-module.exports = function (x) {
+var glob = module.exports = function (x) {
 
   var rest = path.normalize(x).split('/')
   var stream
@@ -49,16 +48,5 @@ module.exports = function (x) {
   })
 
   return pull.apply(null, pipe)
-}
-
-if(!module.parent) {
-  if(!process.argv[2])
-    throw new Error("expect glob: '**/*.js'")
-  s = module.exports(process.argv[2])
-
-  if(/-f|--first/.test(process.argv[3]))
-    s = pull(s, pull.take(1))
-
-  pull(s, pull.drain(console.log))
 }
 

@@ -8,13 +8,14 @@
     "url": "git://github.com/dominictarr/pull-glob.git"
   },
   "dependencies": {
-    "pull-stream": "~2.20",
-    "pull-fs": "~1.1"
+    "pull-fs": "~1.1",
+    "pull-stream": "^3.3.0"
   },
-  "devDependencies": {},
+  "bin":"./bin.js",
   "scripts": {
     "test": "set -e; for t in test/*.js; do node $t; done"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (http://dominictarr.com)",
   "license": "MIT"
 }
+
