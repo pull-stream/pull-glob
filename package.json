@@ -8,7 +8,7 @@
     "url": "git://github.com/dominictarr/pull-glob.git"
   },
   "dependencies": {
-    "pull-fs": "^1.1.5",
+    "pull-fs": "~1.1.6",
     "pull-stream": "^3.3.0"
   },
   "bin": "./bin.js",
