@@ -1,5 +1,5 @@
 var pfs  = require('pull-fs')
-var pull = require('pull-stream/pull')
+var pull = require('pull-stream')
 var path = require('path')
 
 var glob = module.exports = function (x) {
