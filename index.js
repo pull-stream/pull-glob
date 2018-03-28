@@ -4,7 +4,7 @@ var path = require('path')
 
 var glob = module.exports = function (x) {
 
-  var rest = path.normalize(x).split('/')
+  var rest = path.normalize(x).split(path.sep)
   var stream
 
   var pipe = []
